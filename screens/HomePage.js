@@ -196,7 +196,7 @@ const HomePage = () => {
       </View>
       <ScrollView>
         <View className="flex-row justify-center items-center w-full">
-          <HomeCellule text="Mon véhicule" iconSVG={CarSVG} onPress={() => navigation.navigate("MyCar")} />
+          <HomeCellule text="Mon véhicule" iconSVG={CarSVG} onPress={() => navigation.navigate("MyCarPage")} />
           <HomeCellule text="Mes statistiques" iconSVG={ChartSVG} />
         </View>
         <View className="flex-col items-center m-1">
@@ -208,7 +208,7 @@ const HomePage = () => {
           <ExpenseItemLong number="1558" suffixe="km" text="Estimation du kilomètrage à la fin de l'année" />
         </View>
         <View className="mt-5 p-1">
-          <TouchableOpacity className="flex-row justify-between items-center w-full mb-3">
+          <TouchableOpacity className="flex-row justify-between items-center w-full mb-3" onPress={() => navigation.navigate("HistoryPage")}>
             <Text className="text-white text-xl font-bold">Dépenses récentes</Text>
 
             <SvgUri width="18" height="18" source={ArrowRightSVG} />

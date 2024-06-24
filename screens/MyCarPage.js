@@ -5,7 +5,7 @@ import SvgUri from "react-native-svg-uri";
 import ChevronBackSVG from "../components/icons/chevron-back.svg";
 import LogoMyCarSVG from "../components/LogoMyCar.svg";
 
-const MyCar = () => {
+const MyCarPage = () => {
   const navigation = useNavigation();
 
   return (
@@ -30,4 +30,4 @@ const MyCar = () => {
   );
 };
 
-export default MyCar;
+export default MyCarPage;
