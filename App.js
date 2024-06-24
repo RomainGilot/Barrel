@@ -6,6 +6,7 @@ import HistoryPage from "./screens/HistoryPage";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
+import StatisticsPage from "./screens/StatisticsPage";
 
 const Stack = createStackNavigator();
 
@@ -16,6 +17,7 @@ const App = () => {
         <Stack.Screen name="HomePage" component={HomePage} options={{ title: "HomePage", headerShown: false }} />
         <Stack.Screen name="MyCarPage" component={MyCarPage} options={{ title: "MyCarPage", headerShown: false }} />
         <Stack.Screen name="HistoryPage" component={HistoryPage} options={{ title: "HistoryPage", headerShown: false }} />
+        <Stack.Screen name="StatisticsPage" component={StatisticsPage} options={{ title: "StatisticsPage", headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

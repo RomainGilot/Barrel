@@ -3,15 +3,11 @@ import SvgUri from "react-native-svg-uri";
 import ChevronRightSVG from "./icons/chevron-right.svg";
 import { useNavigation } from "@react-navigation/native";
 
-const HomeCellule = ({ iconSVG, text, props }) => {
+const HomeCellule = ({ iconSVG, text, props, nav }) => {
   const navigation = useNavigation();
 
   return (
-    <TouchableOpacity
-      className="w-[47%] bg-[#1C1C1E] border-2 border-[#39393D] rounded-[16px] p-3 m-2"
-      onPress={() => navigation.navigate("MyCarPage")}
-      {...props}
-    >
+    <TouchableOpacity className="w-[47%] bg-[#1C1C1E] border-2 border-[#39393D] rounded-[16px] p-3 m-2" onPress={() => navigation.navigate(nav)}>
       <View className="flex-row justify-between">
         <View className="bg-[#39393D] p-2 rounded-lg flex-row items-center justify-center">
           <SvgUri width="20" height="20" source={iconSVG} />

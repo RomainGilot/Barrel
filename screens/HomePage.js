@@ -196,8 +196,8 @@ const HomePage = () => {
       </View>
       <ScrollView>
         <View className="flex-row justify-center items-center w-full">
-          <HomeCellule text="Mon véhicule" iconSVG={CarSVG} onPress={() => navigation.navigate("MyCarPage")} />
-          <HomeCellule text="Mes statistiques" iconSVG={ChartSVG} />
+          <HomeCellule text="Mon véhicule" iconSVG={CarSVG} nav="MyCarPage" />
+          <HomeCellule text="Mes statistiques" iconSVG={ChartSVG} nav="StatisticsPage" />
         </View>
         <View className="flex-col items-center m-1">
           <ExpenseItemLong number="730" suffixe="jours restants" text="Le prochain contrôle technique sera à faire le Mercredi 24 Juin 2026" />
