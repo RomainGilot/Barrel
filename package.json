@@ -9,13 +9,23 @@
     "web": "expo start --web"
   },
   "dependencies": {
-    "expo": "~51.0.14",
+    "@react-navigation/stack": "^6.3.29",
+    "expo": "^51.0.14",
     "expo-status-bar": "~1.12.1",
+    "metro-react-native-babel-preset": "^0.77.0",
+    "nativewind": "^2.0.11",
+    "postcss": "^8.4.38",
     "react": "18.2.0",
-    "react-native": "0.74.2"
+    "react-native": "0.74.2",
+    "react-native-reanimated": "^3.12.1",
+    "react-native-svg": "^15.3.0",
+    "react-native-svg-transformer": "^1.4.0",
+    "react-native-svg-uri": "^1.2.3",
+    "react-navigation": "^5.0.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0"
+    "@babel/core": "^7.20.0",
+    "tailwindcss": "^3.3.2"
   },
   "private": true
 }
