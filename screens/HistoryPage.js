@@ -1,9 +1,10 @@
-import React, { useState } from "react";
-import { SafeAreaView, TouchableOpacity, View, Text, ScrollView } from "react-native";
+import React, { useState, useEffect } from "react";
+import { SafeAreaView, TouchableOpacity, View, Text, ScrollView, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import SvgUri from "react-native-svg-uri";
 import ChevronBackSVG from "../components/icons/chevron-back.svg";
-import ExpenseItem from "../components/ExpenseItem"; // Assurez-vous du bon chemin d'importation
+import ExpenseItem from "../components/ExpenseItem";
 
 const monthNames = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
 
@@ -27,37 +28,39 @@ const groupExpensesByMonthAndYear = (expenses) => {
 
 const HistoryPage = () => {
   const navigation = useNavigation();
-  const [expenses, setExpenses] = useState([
-    // Votre liste de dépenses
-    { id: 1, amount: 56.32, volume: 49.23, kilometers: 68076, pricePerLiter: 1.5, date: "20/06/2024" },
-    { id: 2, amount: 45.75, volume: 40.12, kilometers: 70213, pricePerLiter: 1.35, date: "18/04/2024" },
-    { id: 3, amount: 62.4, volume: 52.87, kilometers: 69000, pricePerLiter: 1.18, date: "15/04/2024" },
-    { id: 4, amount: 48.15, volume: 42.36, kilometers: 67500, pricePerLiter: 1.4, date: "12/04/2024" },
-    { id: 5, amount: 55.21, volume: 48.75, kilometers: 67000, pricePerLiter: 1.13, date: "10/04/2024" },
-    { id: 6, amount: 60.85, volume: 54.23, kilometers: 66500, pricePerLiter: 1.25, date: "08/04/2024" },
-    { id: 7, amount: 57.92, volume: 51.28, kilometers: 66000, pricePerLiter: 1.3, date: "05/04/2024" },
-    { id: 8, amount: 52.18, volume: 46.32, kilometers: 65500, pricePerLiter: 1.45, date: "02/04/2024" },
-    { id: 9, amount: 49.63, volume: 44.12, kilometers: 65000, pricePerLiter: 1.38, date: "30/03/2024" },
-    { id: 10, amount: 47.85, volume: 42.65, kilometers: 64500, pricePerLiter: 1.28, date: "28/03/2024" },
-    { id: 11, amount: 54.29, volume: 47.81, kilometers: 64000, pricePerLiter: 1.33, date: "25/03/2024" },
-  ]);
+  const [expenses, setExpenses] = useState([]);
 
-  // Grouper les dépenses par mois et année
+  useEffect(() => {
+    loadExpenses();
+  }, []);
+
+  const loadExpenses = async () => {
+    try {
+      const jsonExpenses = await AsyncStorage.getItem("@expenses");
+      if (jsonExpenses !== null) {
+        setExpenses(JSON.parse(jsonExpenses));
+      }
+    } catch (error) {
+      console.error("Error loading expenses from AsyncStorage:", error);
+      Alert.alert("Erreur", "Une erreur est survenue lors du chargement de l'historique des dépenses.");
+    }
+  };
+
   const groupedExpenses = groupExpensesByMonthAndYear(expenses);
 
   return (
-    <SafeAreaView className="flex-1 bg-black">
-      <View className="flex-row items-center justify-between p-4">
-        <TouchableOpacity onPress={() => navigation.goBack()} className="w-1/6">
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#000" }}>
+      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 16 }}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: "20%" }}>
           <SvgUri width="20" height="20" source={ChevronBackSVG} />
         </TouchableOpacity>
-        <Text className="text-white text-lg font-medium flex-4 text-center">Historique</Text>
-        <View className="w-1/6"></View>
+        <Text style={{ color: "#fff", fontSize: 18, fontWeight: "bold", textAlign: "center", flex: 1 }}>Historique</Text>
+        <View style={{ width: "20%" }} />
       </View>
-      <ScrollView className="p-4">
+      <ScrollView style={{ padding: 16 }}>
         {Object.keys(groupedExpenses).map((monthYear) => (
           <View key={monthYear}>
-            <Text className="text-white text-xl font-bold mb-2">{monthYear}</Text>
+            <Text style={{ color: "#fff", fontSize: 20, fontWeight: "bold", marginBottom: 8 }}>{monthYear}</Text>
             {groupedExpenses[monthYear].map((expense) => (
               <ExpenseItem
                 key={expense.id}

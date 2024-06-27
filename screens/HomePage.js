@@ -1,5 +1,9 @@
-import { SafeAreaView, View, Text, TouchableOpacity, ScrollView } from "react-native";
+// HomePage.js
+
+import React, { useState, useEffect } from "react";
+import { SafeAreaView, StyleSheet, View, Text, TouchableOpacity, ScrollView, Modal, TextInput, Alert, Dimensions } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import SvgUri from "react-native-svg-uri";
 import CarSVG from "../components/icons/car.svg";
 import ChartSVG from "../components/icons/chart.svg";
@@ -8,264 +12,269 @@ import SettingsSVG from "../components/icons/settings.svg";
 import PlusSVG from "../components/icons/plus.svg";
 import HomeCellule from "../components/HomeCellule";
 import ExpenseItem from "../components/ExpenseItem";
-import { useState } from "react";
 import LogoSVG from "../components/Logo.svg";
 import ExpenseItemLong from "../components/ExpenseItemLong";
 
 const HomePage = () => {
   const navigation = useNavigation();
+  const [modalVisible, setModalVisible] = useState(false);
+  const [expenses, setExpenses] = useState([]);
+  const [nextTechnicalCheckDate, setNextTechnicalCheckDate] = useState();
 
-  const [expenses, setExpenses] = useState([
-    {
-      id: 1,
-      amount: 56.32,
-      volume: 49.23,
-      kilometers: 68076,
-      pricePerLiter: 1.5,
-      date: "20/04/2024",
-    },
-    {
-      id: 2,
-      amount: 45.75,
-      volume: 40.12,
-      kilometers: 70213,
-      pricePerLiter: 1.35,
-      date: "18/04/2024",
-    },
-    {
-      id: 3,
-      amount: 62.4,
-      volume: 52.87,
-      kilometers: 69000,
-      pricePerLiter: 1.18,
-      date: "15/04/2024",
-    },
-    {
-      id: 4,
-      amount: 48.15,
-      volume: 42.36,
-      kilometers: 67500,
-      pricePerLiter: 1.4,
-      date: "12/04/2024",
-    },
-    {
-      id: 5,
-      amount: 55.21,
-      volume: 48.75,
-      kilometers: 67000,
-      pricePerLiter: 1.13,
-      date: "10/04/2024",
-    },
-    {
-      id: 6,
-      amount: 60.85,
-      volume: 54.23,
-      kilometers: 66500,
-      pricePerLiter: 1.25,
-      date: "08/04/2024",
-    },
-    {
-      id: 7,
-      amount: 57.92,
-      volume: 51.28,
-      kilometers: 66000,
-      pricePerLiter: 1.3,
-      date: "05/04/2024",
-    },
-    {
-      id: 8,
-      amount: 52.18,
-      volume: 46.32,
-      kilometers: 65500,
-      pricePerLiter: 1.45,
-      date: "02/04/2024",
-    },
-    {
-      id: 9,
-      amount: 49.63,
-      volume: 44.12,
-      kilometers: 65000,
-      pricePerLiter: 1.38,
-      date: "30/03/2024",
-    },
-    {
-      id: 10,
-      amount: 47.85,
-      volume: 42.65,
-      kilometers: 64500,
-      pricePerLiter: 1.28,
-      date: "28/03/2024",
-    },
-    {
-      id: 11,
-      amount: 54.29,
-      volume: 47.81,
-      kilometers: 64000,
-      pricePerLiter: 1.33,
-      date: "25/03/2024",
-    },
-    {
-      id: 12,
-      amount: 58.76,
-      volume: 52.18,
-      kilometers: 63500,
-      pricePerLiter: 1.22,
-      date: "22/03/2024",
-    },
-    {
-      id: 13,
-      amount: 61.43,
-      volume: 54.32,
-      kilometers: 63000,
-      pricePerLiter: 1.17,
-      date: "20/03/2024",
-    },
-    {
-      id: 14,
-      amount: 50.87,
-      volume: 45.76,
-      kilometers: 62500,
-      pricePerLiter: 1.39,
-      date: "18/03/2024",
-    },
-    {
-      id: 15,
-      amount: 46.92,
-      volume: 41.85,
-      kilometers: 62000,
-      pricePerLiter: 1.42,
-      date: "15/03/2024",
-    },
-    {
-      id: 16,
-      amount: 53.15,
-      volume: 47.32,
-      kilometers: 61500,
-      pricePerLiter: 1.27,
-      date: "12/03/2024",
-    },
-    {
-      id: 17,
-      amount: 59.27,
-      volume: 52.76,
-      kilometers: 61000,
-      pricePerLiter: 1.24,
-      date: "10/03/2024",
-    },
-    {
-      id: 18,
-      amount: 63.18,
-      volume: 56.32,
-      kilometers: 60500,
-      pricePerLiter: 1.15,
-      date: "08/03/2024",
-    },
-    {
-      id: 19,
-      amount: 48.75,
-      volume: 43.21,
-      kilometers: 60000,
-      pricePerLiter: 1.36,
-      date: "05/03/2024",
-    },
-    {
-      id: 20,
-      amount: 55.84,
-      volume: 49.67,
-      kilometers: 59500,
-      pricePerLiter: 1.31,
-      date: "02/03/2024",
-    },
-  ]);
+  useEffect(() => {
+    loadExpenses();
+  }, []);
 
-  expenses.sort((a, b) => {
-    const dateA = new Date(a.date.split("/").reverse().join("/"));
-    const dateB = new Date(b.date.split("/").reverse().join("/"));
-    return dateB - dateA;
-  });
+  const loadExpenses = async () => {
+    try {
+      const jsonExpenses = await AsyncStorage.getItem("@expenses");
+      if (jsonExpenses !== null) {
+        setExpenses(JSON.parse(jsonExpenses));
+      }
+    } catch (error) {
+      console.error("Error loading expenses from AsyncStorage:", error);
+    }
+  };
 
-  const lastTenExpenses = expenses.slice(0, 10);
+  const loadNextTechnicalCheckDate = async () => {
+    try {
+      const jsonDate = await AsyncStorage.getItem("@vehicle_data.controleTechnique");
+      if (jsonDate !== null) {
+        setNextTechnicalCheckDate(new Date(jsonDate));
+      }
+    } catch (error) {
+      console.error("Error loading next technical check date from AsyncStorage:", error);
+    }
+  };
 
+  const saveExpense = async (newExpense) => {
+    try {
+      const updatedExpenses = [...expenses, newExpense];
+      await AsyncStorage.setItem("@expenses", JSON.stringify(updatedExpenses));
+      setExpenses(updatedExpenses);
+      setModalVisible(false);
+    } catch (error) {
+      console.error("Error saving expense to AsyncStorage:", error);
+      Alert.alert("Erreur", "Une erreur est survenue lors de l'enregistrement de la dépense.");
+    }
+  };
+
+  const deleteExpense = async (expenseId) => {
+    try {
+      const updatedExpenses = expenses.filter((expense) => expense.id !== expenseId);
+      await AsyncStorage.setItem("@expenses", JSON.stringify(updatedExpenses));
+      setExpenses(updatedExpenses);
+    } catch (error) {
+      console.error("Error deleting expense from AsyncStorage:", error);
+      Alert.alert("Erreur", "Une erreur est survenue lors de la suppression de la dépense.");
+    }
+  };
+
+  const [price, setPrice] = useState("");
+  const [liters, setLiters] = useState("");
+  const [kilometers, setKilometers] = useState("");
+
+  const handleSaveExpense = () => {
+    if (!price || !liters || !kilometers) {
+      Alert.alert("Erreur", "Veuillez remplir tous les champs du formulaire.");
+      return;
+    }
+
+    const newExpense = {
+      id: Date.now().toString(),
+      amount: parseFloat(price),
+      volume: parseFloat(liters),
+      kilometers: parseInt(kilometers, 10),
+      pricePerLiter: parseFloat((price / liters).toFixed(2)),
+      date: new Date().toLocaleDateString("fr-FR"),
+    };
+
+    saveExpense(newExpense);
+  };
+  const screenHeight = Dimensions.get("window").height;
   return (
-    <SafeAreaView className="flex-1 bg-black">
-      <View className="flex-row items-center justify-between p-4 z-50">
-        <Text className="text-white text-4xl font-bold">Barrel</Text>
-        <TouchableOpacity>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#000" }}>
+      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", padding: 16, zIndex: 50 }}>
+        <Text style={{ color: "#fff", fontSize: 24, fontWeight: "bold" }}>Barrel</Text>
+        <TouchableOpacity onPress={() => {}}>
           <SvgUri width="28" height="28" source={SettingsSVG} />
         </TouchableOpacity>
       </View>
-      <ScrollView>
-        <View className="flex-row justify-center items-center w-full">
+      <ScrollView style={{ paddingHorizontal: 16 }}>
+        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
           <HomeCellule text="Mon véhicule" iconSVG={CarSVG} nav="MyCarPage" />
           <HomeCellule text="Mes statistiques" iconSVG={ChartSVG} nav="StatisticsPage" />
         </View>
-        <View className="flex-col items-center m-1">
+        <View style={{ alignItems: "center", marginTop: 16 }}>
           <ExpenseItemLong number="730" suffixe="jours restants" text="Le prochain contrôle technique sera à faire le Mercredi 24 Juin 2026" />
         </View>
-        <View className="p-1 mt-2">
-          <Text className="text-white text-xl font-bold">Estimations</Text>
-          <ExpenseItemLong number="2331" suffixe="km" text="Estimation du kilomètrage au prochain plein" />
-          <ExpenseItemLong number="1558" suffixe="km" text="Estimation du kilomètrage à la fin de l'année" />
-        </View>
-        <View className="mt-5 p-1">
-          <TouchableOpacity className="flex-row justify-between items-center w-full mb-3" onPress={() => navigation.navigate("HistoryPage")}>
-            <Text className="text-white text-xl font-bold">Dépenses récentes</Text>
+        {expenses.length > 1 && (
+          <View style={{ padding: 8, marginTop: 16 }}>
+            <Text style={{ color: "#fff", fontSize: 20, fontWeight: "bold", marginBottom: 10 }}>Estimations</Text>
+            <View style={{ marginBottom: 16 }}>
+              <ExpenseItemLong number="2331" suffixe="km" text="Estimation du kilomètrage au prochain plein" />
+            </View>
+            <ExpenseItemLong number="1558" suffixe="km" text="Estimation du kilomètrage à la fin de l'année" />
+          </View>
+        )}
 
-            <SvgUri width="18" height="18" source={ArrowRightSVG} />
-          </TouchableOpacity>
+        <View style={{ marginTop: 24, padding: 8 }}>
+          {expenses.length != 0 && (
+            <TouchableOpacity
+              style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}
+              onPress={() => navigation.navigate("HistoryPage")}
+            >
+              <Text style={{ color: "#fff", fontSize: 20, fontWeight: "bold", marginBottom: 10 }}>Dépenses récentes</Text>
+              <SvgUri width="18" height="18" source={ArrowRightSVG} />
+            </TouchableOpacity>
+          )}
           <View>
-            {lastTenExpenses.length > 0 ? (
-              <View>
-                {lastTenExpenses.map((expense) => (
-                  <ExpenseItem
-                    key={expense.id}
-                    amount={expense.amount}
-                    volume={expense.volume}
-                    kilometers={expense.kilometers}
-                    pricePerLiter={expense.pricePerLiter}
-                    date={expense.date}
-                  />
-                ))}
-              </View>
+            {expenses.length > 0 ? (
+              expenses.slice(0, 10).map((expense) => (
+                <ExpenseItem
+                  key={expense.id}
+                  id={expense.id}
+                  amount={expense.amount}
+                  volume={expense.volume}
+                  kilometers={expense.kilometers}
+                  pricePerLiter={expense.pricePerLiter}
+                  date={expense.date}
+                  onDelete={deleteExpense} // Passer la fonction deleteExpense
+                />
+              ))
             ) : (
-              <View className="flex-col justify-center items-center w-full mt-5">
+              <View style={{ alignItems: "center", marginTop: 24 }}>
                 <SvgUri width="100" height="100" source={LogoSVG} />
-                <Text className="text-white text-base">Vous n'avez fait aucune entrée pour l'instant</Text>
+                <Text style={{ color: "#fff", fontSize: 16 }}>Vous n'avez fait aucune entrée pour l'instant</Text>
                 <TouchableOpacity>
-                  <Text className="text-[#FFFF00] text-base font-bold">Ajouter une entrée</Text>
+                  <Text style={{ color: "#FFFF00", fontSize: 16, fontWeight: "bold" }} onPress={() => setModalVisible(true)}>
+                    Ajouter une entrée
+                  </Text>
                 </TouchableOpacity>
               </View>
             )}
           </View>
         </View>
       </ScrollView>
-      <View
-        style={{
-          position: "absolute",
-          bottom: 40,
-          right: 0,
-          left: 0,
-          justifyContent: "center",
-          alignItems: "center",
-          zIndex: 30,
-          paddingHorizontal: 20,
-          paddingVertical: 12,
-          borderRadius: 100,
-          marginHorizontal: "auto",
-        }}
-      >
-        <TouchableOpacity
-          style={{
-            backgroundColor: "#FFFF00",
-            borderRadius: 100,
-            padding: 20,
-          }}
-        >
+
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.button} onPress={() => setModalVisible(true)}>
           <SvgUri width="20" height="20" source={PlusSVG} />
         </TouchableOpacity>
       </View>
+
+      <Modal transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(false)} animationType="slide">
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
+          <TouchableOpacity style={{ flex: 1, width: "100%" }} activeOpacity={1} onPressOut={() => setModalVisible(false)} />
+          <View style={{ width: "100%", height: "90%", backgroundColor: "#1c1c1e", borderTopLeftRadius: 20, borderTopRightRadius: 20 }}>
+            <View style={{ flex: 1, justifyContent: "space-between" }}>
+              <View style={{ padding: 20 }}>
+                <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                  <TouchableOpacity onPress={() => setModalVisible(false)}>
+                    <Text style={{ color: "#FFFF00" }}>Annuler</Text>
+                  </TouchableOpacity>
+                  <Text style={{ color: "white", fontSize: 18, fontWeight: "bold" }}>Nouvelle entrée</Text>
+                  <TouchableOpacity onPress={handleSaveExpense}>
+                    <Text style={{ color: "#FFFF00" }}>Enregistrer</Text>
+                  </TouchableOpacity>
+                </View>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    backgroundColor: "#2c2c2e",
+                    borderRadius: 10,
+                    marginBottom: 10,
+                  }}
+                >
+                  <TextInput
+                    placeholder="Prix (ex: 76,31)"
+                    placeholderTextColor="#6c6c6e"
+                    style={{ flex: 1, color: "#fff", padding: 12, fontSize: 18 }}
+                    keyboardType="numeric"
+                    value={price}
+                    onChangeText={(text) => setPrice(text)}
+                  />
+                  <Text style={{ color: "#fff", fontSize: 18, fontWeight: "medium", paddingRight: 12 }}>€</Text>
+                </View>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    backgroundColor: "#2c2c2e",
+                    borderRadius: 10,
+                    marginBottom: 10,
+                  }}
+                >
+                  <TextInput
+                    placeholder="Litres (ex: 45,22)"
+                    placeholderTextColor="#6c6c6e"
+                    style={{ backgroundColor: "#2c2c2e", color: "#fff", padding: 12, fontSize: 18, borderRadius: 10 }}
+                    keyboardType="numeric"
+                    value={liters}
+                    onChangeText={(text) => setLiters(text)}
+                  />
+                  <Text style={{ color: "#fff", fontSize: 18, fontWeight: "medium", paddingRight: 12 }}>L</Text>
+                </View>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    backgroundColor: "#2c2c2e",
+                    borderRadius: 10,
+                    marginBottom: 10,
+                  }}
+                >
+                  <TextInput
+                    placeholder="Kilométrage (ex: 68 072)"
+                    placeholderTextColor="#6c6c6e"
+                    style={{ backgroundColor: "#2c2c2e", color: "#fff", padding: 12, fontSize: 18, borderRadius: 10 }}
+                    keyboardType="numeric"
+                    value={kilometers}
+                    onChangeText={(text) => setKilometers(text)}
+                  />
+                  <Text style={{ color: "#fff", fontSize: 18, fontWeight: "medium", paddingRight: 12 }}>KM</Text>
+                </View>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    backgroundColor: "#2c2c2e",
+                    padding: 12,
+                    borderRadius: 10,
+                  }}
+                >
+                  <Text style={{ fontSize: 18, color: "#6c6c6e" }}>Date</Text>
+                  <Text style={{ fontSize: 18, color: "#fff" }}>{new Date().toLocaleDateString("fr-FR")}</Text>
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#000",
+    justifyContent: "center", // Centrer verticalement les éléments dans le conteneur
+  },
+  buttonContainer: {
+    position: "absolute",
+    bottom: 40,
+    alignSelf: "center", // Centrer horizontalement le conteneur de bouton
+  },
+  button: {
+    backgroundColor: "#FFFF00",
+    borderRadius: 100,
+    padding: 20,
+  },
+});
 
 export default HomePage;
